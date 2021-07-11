@@ -10,6 +10,13 @@ import './assets/fonts/iconfont.css'
 
 import axios from 'axios'
 axios.defaults.baseURL = 'http://www.tangxiaoyang.vip:8888/api/v2/'
+// 拦截所有请求，为请求头添加token认证
+axios.interceptors.request.use(config => {
+  const userInfo = JSON.parse(sessionStorage.getItem('userInfo'))
+  config.headers.Authorization = userInfo ? userInfo.token : ''
+  return config
+})
+
 Vue.prototype.$http = axios
 
 Vue.config.productionTip = false

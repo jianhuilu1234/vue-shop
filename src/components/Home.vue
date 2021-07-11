@@ -13,7 +13,19 @@
     </el-header>
     <el-container>
       <!-- 侧边栏 -->
-      <el-aside width="200px">Aside</el-aside>
+      <el-aside width="200px">
+        <el-menu default-active="2" class="el-menu-vertical-demo">
+          <el-submenu index="1">
+            <template slot="title">
+              <i class="el-icon-location"></i>
+              <span>导航一</span>
+            </template>
+            <el-menu-item index="1-1">选项1</el-menu-item>
+            <el-menu-item index="1-2">选项2</el-menu-item>
+            <el-menu-item index="1-3">选项3</el-menu-item>
+          </el-submenu>
+        </el-menu>
+      </el-aside>
       <!-- 主体 -->
       <el-main>Main</el-main>
     </el-container>
@@ -29,6 +41,7 @@ export default {
   },
   created() {
     this.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+    this.getMenuList();
   },
   methods: {
     logout() {
@@ -42,6 +55,14 @@ export default {
           this.$router.push("/login");
         })
         .catch(() => {});
+    },
+    async getMenuList() {
+      const { data: res } = await this.$http.get("menus");
+      if (res.meta.status !== 200) {
+        return this.$message.error(res.meta.msg);
+      }
+      this.menuList = res.data;
+      console.log(this.menuList);
     },
   },
 };
