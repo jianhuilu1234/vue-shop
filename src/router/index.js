@@ -20,8 +20,24 @@ const routes = [
   }
 ]
 
+
 const router = new VueRouter({
   routes
 })
+
+// 增加路由守卫
+router.beforeEach((to, from, next) => {
+  // 如果访问登录页面，则放行
+  if(to.path === '/login'){
+    return next()
+  }
+  // 用户未登录，则跳转至login
+  const userInfo = JSON.parse(sessionStorage.getItem('userInfo'))
+  if(!userInfo){
+    return next('./login')
+  }
+  next()
+})
+
 
 export default router
