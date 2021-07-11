@@ -51,11 +51,21 @@ export default {
     methods:{
         login(){
             // 判断是否校验成功
-            this.$refs.loginFormRef.validate(valid => {
+            this.$refs.loginFormRef.validate(async valid => {
                 if(!valid){
                     return
                 }
-                console.log("login")
+                // 发送请求
+                const {data: res} = await this.$http.post('login', this.loginForm)
+
+                if (res.meta.status !== 200){
+                    return this.$message.error('登录失败！');
+                }
+
+                this.$message.success('登录成功！')
+                // 将用户信息保存到sessionstorage里面
+                sessionStorage.setItem('userInfo', JSON.stringify(res.data))
+                this.$router.push('/home')
             }
             )
         }
