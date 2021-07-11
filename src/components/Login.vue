@@ -11,9 +11,15 @@
                 电商后台管理系统
             </div>
             <!-- 登录表单 -->
-            <el-form ref="form">
-                <el-form-item label="活动名称">
-                    <el-input ></el-input>
+            <el-form ref="loginFormRef" class="login-form" :model="loginForm" :rules="loginFormRules">
+                <el-form-item prop="username">
+                    <el-input placeholder="请输入用户名" prefix-icon="iconfont icon-user" v-model="loginForm.username"></el-input>
+                </el-form-item>
+                <el-form-item prop="password">
+                    <el-input placeholder="请输入密码" show-password prefix-icon="iconfont icon-lock_fill" v-model="loginForm.password"></el-input>
+                </el-form-item>
+                <el-form-item >
+                      <el-button type="primary" class="login-btn" @click="login">登录</el-button>
                 </el-form-item>
             </el-form>
         </div>
@@ -22,6 +28,38 @@
 
 <script>
 export default {
+    data(){
+        return {
+            // 表单的数据绑定对象
+            loginForm:{
+                username: '',
+                password: ''
+            },
+            // 表单的校验规则
+            loginFormRules:{
+                username: [
+                    {required: true, message: '请输入登录账户', trigger: 'blur'},
+                    {min: 3, max: 10, message: '长度在 3 到 10 个字符', trigger: 'blur'}
+                ],
+                password: [
+                    {required: true, message: '请输入登录密码', trigger: 'blur'},
+                    {min: 6, max: 15, message: '长度在 6 到 15 个字符', trigger: 'blur'}
+                ]
+            }
+        }
+    },
+    methods:{
+        login(){
+            // 判断是否校验成功
+            this.$refs.loginFormRef.validate(valid => {
+                if(!valid){
+                    return
+                }
+                console.log("login")
+            }
+            )
+        }
+    }
 
 }
 </script>
@@ -67,6 +105,19 @@ export default {
             transform: translate(-50%);
             font-size: 18px;
             color: #444;
+        }
+        .login-form{
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translate(-50%);
+            padding: 0 20px;
+            width: 80%;
+            box-sizing: border-box;
+
+            .login-btn{
+                width: 100%;
+            }
         }
     }
 }
