@@ -15,14 +15,23 @@
       <!-- 侧边栏 -->
       <el-aside width="200px">
         <el-menu default-active="2" class="el-menu-vertical-demo">
-          <el-submenu index="1">
+          <el-submenu
+            :index="item.id + ''"
+            v-for="item in menuList"
+            :key="item.id"
+          >
             <template slot="title">
-              <i class="el-icon-location"></i>
-              <span>导航一</span>
+              <i :class="iconObj[item.id]"></i>
+              <span>{{ item.authName }}</span>
             </template>
-            <el-menu-item index="1-1">选项1</el-menu-item>
-            <el-menu-item index="1-2">选项2</el-menu-item>
-            <el-menu-item index="1-3">选项3</el-menu-item>
+            <el-menu-item
+              :index="subItem.id + ''"
+              v-for="subItem in item.children"
+              :key="subItem.id"
+            >
+              <i class="el-icon-menu"></i>
+              {{ subItem.authName }}
+            </el-menu-item>
           </el-submenu>
         </el-menu>
       </el-aside>
@@ -37,6 +46,15 @@ export default {
   data() {
     return {
       userInfo: null,
+      menuList: [],
+      // 图标样式对象
+      iconObj: {
+        201: "iconfont icon-shouye",
+        125: "iconfont icon-users",
+        103: "iconfont icon-tijikongjian",
+        101: "iconfont icon-shangpin",
+        102: "iconfont icon-danju",
+      },
     };
   },
   created() {
@@ -62,7 +80,6 @@ export default {
         return this.$message.error(res.meta.msg);
       }
       this.menuList = res.data;
-      console.log(this.menuList);
     },
   },
 };
@@ -94,6 +111,14 @@ export default {
   }
   .right {
     span {
+      margin-right: 10px;
+    }
+  }
+}
+.el-aside {
+  .el-menu {
+    border-right: 0;
+    .iconfont {
       margin-right: 10px;
     }
   }
