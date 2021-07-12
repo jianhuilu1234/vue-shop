@@ -13,8 +13,15 @@
     </el-header>
     <el-container>
       <!-- 侧边栏 -->
-      <el-aside width="200px">
-        <el-menu :default-active="$route.path" class="el-menu-vertical-demo" unique-opened router>
+      <el-aside :width="isCollapse ? '64px': '200px'">
+        <div class="toggle-button" @click="isCollapse=!isCollapse">|||</div>
+        <el-menu
+          :default-active="$route.path"
+          class="el-menu-vertical-demo"
+          unique-opened
+          router
+          :collapse="isCollapse" :collapse-transition="false"
+        >
           <el-submenu
             :index="item.id + ''"
             v-for="item in menuList"
@@ -57,6 +64,7 @@ export default {
         101: "iconfont icon-shangpin",
         102: "iconfont icon-danju",
       },
+      isCollapse: false,
     };
   },
   created() {
@@ -124,5 +132,18 @@ export default {
       margin-right: 10px;
     }
   }
+
+  .toggle-button {
+    background: #60779d;
+    font-size: 10px;
+    line-height: 24px;
+    text-align: center;
+    color: white;
+    letter-spacing: 0.2rem;
+    cursor: pointer;
+  }
+}
+.el-main{
+    background: #eaedf1;
 }
 </style>
