@@ -24,8 +24,34 @@
         </el-col>
       </el-row>
     </el-card>
+
+    <!-- <template> -->
+    <el-table :data="userList" stripe border>
+      <el-table-column label="序号" type="index"></el-table-column>
+      <el-table-column label="姓名" prop="username"></el-table-column>
+      <el-table-column label="邮箱" prop="email"></el-table-column>
+      <el-table-column label="电话" prop="mobile"></el-table-column>
+      <el-table-column label="角色" prop="role_name"></el-table-column>
+      <el-table-column label="状态">
+        <template slot-scope="scope">
+          <el-switch v-model="scope.row.mg_state"> </el-switch>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" prop="role_name">
+        <el-tooltip effect="dark" content="分配角色" placement="top" :enterable="false">
+          <el-button type="primary" icon="el-icon-edit" circle></el-button>
+        </el-tooltip>
+        <el-tooltip effect="dark" content="删除" placement="top">
+        <el-button type="danger" icon="el-icon-delete" circle></el-button>
+        </el-tooltip>
+        <el-tooltip effect="dark" content="设置" placement="top">
+        <el-button type="warning" icon="el-icon-setting" circle></el-button>
+        </el-tooltip>
+      </el-table-column>
+    </el-table>
   </div>
 </template>
+
 
 <script>
 export default {
@@ -39,27 +65,26 @@ export default {
       },
       // 用户列表数据
       userList: [],
-            // 总记录数
+      // 总记录数
       total: 0,
     };
   },
   created() {
-        this.getUserList()
-
+    this.getUserList();
   },
-  methods:{
-    async getUserList(){
-      const {data: res} = await this.$http.get('users', {
+  methods: {
+    async getUserList() {
+      const { data: res } = await this.$http.get("users", {
         params: this.queryInfo,
-      })
-      if(res.meta.status !== 200){
-          return this.$message.error('获取用户列表失败')
+      });
+      if (res.meta.status !== 200) {
+        return this.$message.error("获取用户列表失败");
       }
-      this.userList = res.data.users
-      this.total = res.data.total
-      console.log(res)
-    }
-  }
+      this.userList = res.data.users;
+      this.total = res.data.total;
+      console.log(res);
+    },
+  },
 };
 </script>
 
