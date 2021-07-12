@@ -22,7 +22,7 @@ const routes = [{
       component: () => import('../components/index/Welcome.vue')
     }, {
       path: '/users',
-      component: () => import('../components/index/Users.vue')
+      component: () => import('../components/user/Users.vue')
     }, ]
   }
 ]
