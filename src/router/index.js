@@ -5,8 +5,7 @@ import Home from '../components/Home.vue'
 
 Vue.use(VueRouter)
 
-const routes = [
-  {
+const routes = [{
     path: '/',
     redirect: '/login'
   },
@@ -16,7 +15,15 @@ const routes = [
   },
   {
     path: '/home',
-    component: Home
+    component: Home,
+    redirect: '/welcome',
+    children: [{
+      path: '/welcome',
+      component: () => import('../components/index/Welcome.vue')
+    }, {
+      path: '/users',
+      component: () => import('../components/index/Users.vue')
+    }, ]
   }
 ]
 
@@ -28,12 +35,12 @@ const router = new VueRouter({
 // 增加路由守卫
 router.beforeEach((to, from, next) => {
   // 如果访问登录页面，则放行
-  if(to.path === '/login'){
+  if (to.path === '/login') {
     return next()
   }
   // 用户未登录，则跳转至login
   const userInfo = JSON.parse(sessionStorage.getItem('userInfo'))
-  if(!userInfo){
+  if (!userInfo) {
     return next('./login')
   }
   next()

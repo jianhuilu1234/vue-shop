@@ -14,7 +14,7 @@
     <el-container>
       <!-- 侧边栏 -->
       <el-aside width="200px">
-        <el-menu default-active="2" class="el-menu-vertical-demo">
+        <el-menu :default-active="$route.path" class="el-menu-vertical-demo" unique-opened router>
           <el-submenu
             :index="item.id + ''"
             v-for="item in menuList"
@@ -25,7 +25,7 @@
               <span>{{ item.authName }}</span>
             </template>
             <el-menu-item
-              :index="subItem.id + ''"
+              :index="'/' + subItem.path"
               v-for="subItem in item.children"
               :key="subItem.id"
             >
@@ -36,7 +36,9 @@
         </el-menu>
       </el-aside>
       <!-- 主体 -->
-      <el-main>Main</el-main>
+      <el-main>
+        <router-view></router-view>
+      </el-main>
     </el-container>
   </el-container>
 </template>
