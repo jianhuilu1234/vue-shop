@@ -12,7 +12,13 @@
       <!-- 搜索 -->
       <el-row :gutter="20">
         <el-col :span="8">
-          <el-input placeholder="请输入搜索姓名" class="input-with-select" v-model="queryInfo.query" clearable @clear="getUserList">
+          <el-input
+            placeholder="请输入搜索姓名"
+            class="input-with-select"
+            v-model="queryInfo.query"
+            clearable
+            @clear="getUserList"
+          >
             <el-button
               slot="append"
               icon="el-icon-search"
@@ -35,7 +41,11 @@
       <el-table-column label="角色" prop="role_name"></el-table-column>
       <el-table-column label="状态">
         <template slot-scope="scope">
-          <el-switch v-model="scope.row.mg_state"> </el-switch>
+          <el-switch
+            v-model="scope.row.mg_state"
+            @change="userStateChange(scope.row)"
+          >
+          </el-switch>
         </template>
       </el-table-column>
       <el-table-column label="操作" prop="role_name">
@@ -100,15 +110,25 @@ export default {
       this.total = res.data.total;
       // console.log(res);
     },
+    async userStateChange(userInfo) {
+      const { data: res } = await this.$http.put(
+        `users/${userInfo.id}/state/${userInfo.mg_state}`
+      );
+      if (res.meta.status !== 200) {
+        userInfo.mg_state = !userInfo.mg_state;
+        return this.$message.error("状态更新失败！");
+      }
+      return this.$message.success('更新用户状态成功！')
+    },
     // 监听pagesize改变的事件
     handleSizeChange(pagesize) {
       this.queryInfo.pagesize = pagesize;
-      this.getUserList()
+      this.getUserList();
     },
     // 监听pagenum改变的事件
     handleCurrentChange(pagenum) {
-      this.queryInfo.pagenum = pagenum
-      this.getUserList()
+      this.queryInfo.pagenum = pagenum;
+      this.getUserList();
     },
   },
 };
