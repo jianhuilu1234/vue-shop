@@ -32,6 +32,29 @@
       </el-row>
     </el-card>
 
+    <el-dialog title="添加用户" :visible.sync="addDialogVisible" width="50%">
+      <el-form
+        :model="addForm"
+        :rules="addFormRules"
+        ref="addFormRef"
+        label-width="70px"
+        class="demo-ruleForm"
+      >
+        <el-form-item label="用户名" prop="username">
+          <el-input v-model="addForm.username"></el-input>
+        </el-form-item>
+        <el-form-item label="密码" prop="password">
+          <el-input v-model="addForm.password" show-password></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱" prop="email">
+          <el-input v-model="addForm.email"></el-input>
+        </el-form-item>
+        <el-form-item label="手机号" prop="mobile">
+          <el-input v-model="addForm.mobile"></el-input>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
+
     <!-- <template> -->
     <el-table :data="userList" stripe border>
       <el-table-column label="序号" type="index"></el-table-column>
@@ -93,6 +116,51 @@ export default {
       userList: [],
       // 总记录数
       total: 0,
+      addDialogVisible: false,
+      addForm: {
+        username: "",
+        password: "",
+        email: "",
+        mobile: "",
+      },
+      // 添加用户的校验规则
+      addFormRules: {
+        username: [
+          { required: true, message: "请输入用户名", trigger: "blur" },
+          {
+            min: 3,
+            max: 10,
+            message: "长度在 3 到 10 个字符",
+            trigger: "blur",
+          },
+        ],
+        password: [
+          { required: true, message: "请输入密码", trigger: "blur" },
+          {
+            min: 6,
+            max: 15,
+            message: "长度在 6 到 15 个字符",
+            trigger: "blur",
+          },
+        ],
+        email: [
+          { required: true, message: "请输入邮箱", trigger: "blur" },
+          {
+            pattern: /\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/,
+            message: "邮箱格式不正确",
+            trigger: "blur",
+          },
+        ],
+        mobile: [
+          { required: true, message: "请输入手机号", trigger: "blur" },
+          {
+            pattern:
+              /^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/,
+            message: "手机号格式不正确",
+            trigger: "blur",
+          },
+        ],
+      },
     };
   },
   created() {
@@ -118,7 +186,7 @@ export default {
         userInfo.mg_state = !userInfo.mg_state;
         return this.$message.error("状态更新失败！");
       }
-      return this.$message.success('更新用户状态成功！')
+      return this.$message.success("更新用户状态成功！");
     },
     // 监听pagesize改变的事件
     handleSizeChange(pagesize) {
