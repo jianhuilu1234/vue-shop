@@ -38,17 +38,32 @@
         </template>
       </el-table-column>
       <el-table-column label="操作" prop="role_name">
-        <el-tooltip effect="dark" content="分配角色" placement="top" :enterable="false">
+        <el-tooltip
+          effect="dark"
+          content="分配角色"
+          placement="top"
+          :enterable="false"
+        >
           <el-button type="primary" icon="el-icon-edit" circle></el-button>
         </el-tooltip>
         <el-tooltip effect="dark" content="删除" placement="top">
-        <el-button type="danger" icon="el-icon-delete" circle></el-button>
+          <el-button type="danger" icon="el-icon-delete" circle></el-button>
         </el-tooltip>
         <el-tooltip effect="dark" content="设置" placement="top">
-        <el-button type="warning" icon="el-icon-setting" circle></el-button>
+          <el-button type="warning" icon="el-icon-setting" circle></el-button>
         </el-tooltip>
       </el-table-column>
     </el-table>
+    <el-pagination
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page="queryInfo.pagenum"
+      :page-sizes="[1, 2, 5, 10]"
+      :page-size="queryInfo.pagesize"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="total"
+    >
+    </el-pagination>
   </div>
 </template>
 
@@ -82,7 +97,17 @@ export default {
       }
       this.userList = res.data.users;
       this.total = res.data.total;
-      console.log(res);
+      // console.log(res);
+    },
+    // 监听pagesize改变的事件
+    handleSizeChange(pagesize) {
+      this.queryInfo.pagesize = pagesize;
+      this.getUserList()
+    },
+    // 监听pagenum改变的事件
+    handleCurrentChange(pagenum) {
+      this.queryInfo.pagenum = pagenum
+      this.getUserList()
     },
   },
 };
