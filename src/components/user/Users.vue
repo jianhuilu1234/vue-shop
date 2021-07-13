@@ -12,10 +12,11 @@
       <!-- 搜索 -->
       <el-row :gutter="20">
         <el-col :span="8">
-          <el-input placeholder="请输入搜索姓名" class="input-with-select">
+          <el-input placeholder="请输入搜索姓名" class="input-with-select" v-model="queryInfo.query" clearable @clear="getUserList">
             <el-button
               slot="append"
               icon="el-icon-search"
+              @click="getUserList"
             ></el-button> </el-input
         ></el-col>
         <!-- 添加 -->
