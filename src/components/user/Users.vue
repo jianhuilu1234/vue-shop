@@ -91,6 +91,7 @@
             :enterable="false"
           >
             <el-button
+              size="mini"
               type="primary"
               icon="el-icon-edit"
               circle
@@ -98,10 +99,21 @@
             ></el-button>
           </el-tooltip>
           <el-tooltip effect="dark" content="删除" placement="top">
-            <el-button type="danger" icon="el-icon-delete" circle></el-button>
+            <el-button
+              type="danger"
+              icon="el-icon-delete"
+              size="mini"
+              circle
+              @click="deleteUserById(scope.row.id)"
+            ></el-button>
           </el-tooltip>
           <el-tooltip effect="dark" content="设置" placement="top">
-            <el-button type="warning" icon="el-icon-setting" circle></el-button>
+            <el-button
+              type="warning"
+              icon="el-icon-setting"
+              size="mini"
+              circle
+            ></el-button>
           </el-tooltip>
         </template>
       </el-table-column>
@@ -319,23 +331,22 @@ export default {
     editFormClosed() {
       this.$refs.editFormRef.resetFields();
     },
-    deleteUserById() {
-      this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
+    deleteUserById(id) {
+      this.$confirm("确定删除该用户, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
       })
-        .then(() => {
-          this.$message({
-            type: "success",
-            message: "删除成功!",
-          });
+        .then(async () => {
+          const { data: res } = await this.$http.delete(`users/${id}`);
+          if (res.meta.status !== 200) {
+            return this.$message.error("删除用户失败!");
+          }
+          this.getUserList();
+          this.$message.success("删除用户成功!");
         })
         .catch(() => {
-          this.$message({
-            type: "info",
-            message: "已取消删除",
-          });
+          this.$message.info("已取消删除");
         });
     },
   },
