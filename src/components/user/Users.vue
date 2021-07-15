@@ -27,12 +27,19 @@
         ></el-col>
         <!-- 添加 -->
         <el-col :span="4">
-          <el-button type="primary">添加用户</el-button>
+          <el-button type="primary" @click="addDialogVisible = true"
+            >添加用户</el-button
+          >
         </el-col>
       </el-row>
     </el-card>
 
-    <el-dialog title="添加用户" :visible.sync="addDialogVisible" width="50%">
+    <el-dialog
+      title="添加用户"
+      :visible.sync="addDialogVisible"
+      width="50%"
+      @close="addFormClosed"
+    >
       <el-form
         :model="addForm"
         :rules="addFormRules"
@@ -53,6 +60,12 @@
           <el-input v-model="addForm.mobile"></el-input>
         </el-form-item>
       </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="addDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="addUser"
+          >确 定</el-button
+        >
+      </div>
     </el-dialog>
 
     <!-- <template> -->
@@ -123,6 +136,7 @@ export default {
         email: "",
         mobile: "",
       },
+
       // 添加用户的校验规则
       addFormRules: {
         username: [
@@ -197,6 +211,24 @@ export default {
     handleCurrentChange(pagenum) {
       this.queryInfo.pagenum = pagenum;
       this.getUserList();
+    },
+    // 监听添加用户对话框的关闭事件
+    addFormClosed() {
+      this.$refs.addFormRef.resetFields();
+    },
+    addUser() {
+      this.$refs.addFormRef.validate(async (validate) => {
+        if (!validate) {
+          return;
+        }
+        const { data: res } = await this.$http.post("users", this.addForm);
+        if (res.meta.status !== 201) {
+          return this.$message.error("添加用户失败");
+        }
+        this.addDialogVisible = false
+        this.$message.success("添加用户成功")
+        this.getUserList()
+      });
     },
   },
 };
