@@ -34,14 +34,12 @@
               size="mini"
               type="danger"
               icon="el-icon-delete"
-              @click="removeRoleById(scope.row.id)"
               >删除</el-button
             >
             <el-button
               size="mini"
               type="warning"
               icon="el-icon-setting"
-              @click="showRightDialog(scope.row)"
               >分配权限</el-button
             >
           </template>
@@ -82,6 +80,40 @@
         <el-button type="primary" @click="addRole">确 定</el-button>
       </div>
     </el-dialog>
+
+    <!-- 编辑角色的对话框 -->
+    <el-dialog
+      title="编辑角色"
+      :visible.sync="editDialogVisible"
+      width="50%"
+      @close="editRoleClosed"
+    >
+      <el-form
+        :model="editForm"
+        :rules="editFormRules"
+        ref="editFormRef"
+        label-width="80px"
+      >
+        <el-form-item
+          label="角色名称"
+          :label-width="formLabelWidth"
+          prop="roleName"
+        >
+          <el-input v-model="editForm.roleName" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item
+          label="角色描述"
+          :label-width="formLabelWidth"
+          prop="roleDesc"
+        >
+          <el-input v-model="editForm.roleDesc" autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="editDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="editRole">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -104,6 +136,16 @@ export default {
           { required: true, message: "请输入角色描述", trigger: "blur" },
         ],
       },
+      editDialogVisible: false,
+      editFormRules: {
+        roleName: [
+          { required: true, message: "请输入角色名称", trigger: "blur" },
+        ],
+        roleDesc: [
+          { required: true, message: "请输入角色描述", trigger: "blur" },
+        ],
+      },
+      editForm:{},
     };
   },
   created() {
@@ -118,6 +160,7 @@ export default {
       }
       this.rolesList = res.data;
     },
+
     // 添加角色
 
     addRole() {
@@ -137,7 +180,41 @@ export default {
     // 监听添加角色对话框的关闭事件
     addRoleClosed() {
       this.$refs.addFormRef.resetFields();
+    },    
+
+    // 监听关闭角色对话框的关闭事件
+    editRoleClosed() {
+      this.$refs.editFormRef.resetFields();
     },
+
+    async showEditDialog(id){
+      const {data:res} = await this.$http.get(`roles/${id}`)
+      if(res.meta.status !== 200){
+        return this.$message.error('查询角色信息失败!')
+      }
+      this.editForm = res.data
+      this.editDialogVisible = true
+    },
+
+
+    editRole(){
+      this.$refs.editFormRef.validate(async (validate)=>{
+        if (!validate){
+          return
+        }
+        const {data:res} = await this.$http.put(`roles/${this.editForm.roleId}`,{
+          roleName: this.editForm.roleName,
+          roleDesc: this.editForm.roleDesc
+        })
+        if(res.meta.status !== 200){
+          return this.$message.error('更新角色信息失败')
+        }
+        this.editDialogVisible = false
+        this.getRolesList()
+        this.$message.success('更新用户信息成功')
+      })
+    }
+
   },
 };
 </script>
