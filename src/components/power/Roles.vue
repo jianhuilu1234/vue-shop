@@ -27,7 +27,9 @@
               :class="{ bdbottom: true, bdtop: i1 == 0, vcenter: true }"
             >
               <el-col :span="5">
-                <el-tag closable>{{ item1.authName }} </el-tag>
+                <el-tag closable @close="removeRightById(scope.row, item1.id)"
+                  >{{ item1.authName }}
+                </el-tag>
               </el-col>
               <el-col :span="19">
                 <el-row
@@ -36,12 +38,21 @@
                   :class="{ bdtop: i2 != 0, vcenter: true }"
                 >
                   <el-col :span="6"
-                    ><el-tag closable type="success"
+                    ><el-tag
+                      closable
+                      type="success"
+                      @close="removeRightById(scope.row, item2.id)"
                       >{{ item2.authName }}
                     </el-tag></el-col
                   >
                   <el-col :span="18">
-                    <el-tag v-for="item3 in item2.children" :key="item3.id">
+                    <el-tag
+                      v-for="item3 in item2.children"
+                      :key="item3.id"
+                      type="warning"
+                      closable
+                      @close="removeRightById(scope.row, item3.id)"
+                    >
                       {{ item3.authName }}
                     </el-tag>
                   </el-col>
@@ -263,6 +274,34 @@ export default {
           this.$message({
             type: "success",
             message: "删除角色成功!",
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除",
+          });
+        });
+    },
+    //根据ID删除角色下的权限
+    removeRightById(role, rightId) {
+      this.$confirm("确认删除该权限吗?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(async () => {
+          const { data: res } = await this.$http.delete(
+            `roles/${role.id}/rights/${rightId}`
+          );
+          if (res.meta.status !== 200) {
+            return this.$message.error("删除权限失败");
+          }
+          //   this.getRolesList()  // 不建议重新获取所有角色列表，会导致页面刷新
+          role.children = res.data; // 重新设置当前角色下最新的权限数据
+          this.$message({
+            type: "success",
+            message: "删除权限成功!",
           });
         })
         .catch(() => {
