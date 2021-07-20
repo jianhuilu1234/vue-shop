@@ -34,6 +34,7 @@
               size="mini"
               type="danger"
               icon="el-icon-delete"
+              @click="removeRoleById(scope.row.id)"
               >删除</el-button
             >
             <el-button
@@ -196,7 +197,6 @@ export default {
       this.editDialogVisible = true
     },
 
-
     editRole(){
       this.$refs.editFormRef.validate(async (validate)=>{
         if (!validate){
@@ -213,6 +213,29 @@ export default {
         this.getRolesList()
         this.$message.success('更新用户信息成功')
       })
+    },
+
+    removeRoleById(id){
+        this.$confirm('确认删除该角色吗?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(async () => {
+          const {data:res} = await this.$http.delete(`roles/${id}`)
+          if(res.meta.status !== 200){
+            return this.$message.error('删除角色失败')
+          }
+          this.getRolesList()
+          this.$message({
+            type: 'success',
+            message: '删除角色成功!'
+          });
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });          
+        });
     }
 
   },
