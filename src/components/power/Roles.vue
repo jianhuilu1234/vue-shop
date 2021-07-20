@@ -18,6 +18,38 @@
 
       <!-- 角色列表 -->
       <el-table :data="rolesList" border stripe>
+        <el-table-column label="明细" type="expand">
+          <template slot-scope="scope">
+            <!-- 一级权限 -->
+            <el-row
+              v-for="(item1, i1) in scope.row.children"
+              :key="item1.id"
+              :class="{ bdbottom: true, bdtop: i1 == 0, vcenter: true }"
+            >
+              <el-col :span="5">
+                <el-tag closable>{{ item1.authName }} </el-tag>
+              </el-col>
+              <el-col :span="19">
+                <el-row
+                  v-for="(item2, i2) in item1.children"
+                  :key="item2.id"
+                  :class="{ bdtop: i2 != 0, vcenter: true }"
+                >
+                  <el-col :span="6"
+                    ><el-tag closable type="success"
+                      >{{ item2.authName }}
+                    </el-tag></el-col
+                  >
+                  <el-col :span="18">
+                    <el-tag v-for="item3 in item2.children" :key="item3.id">
+                      {{ item3.authName }}
+                    </el-tag>
+                  </el-col>
+                </el-row>
+              </el-col>
+            </el-row>
+          </template>
+        </el-table-column>
         <el-table-column label="序号" type="index"></el-table-column>
         <el-table-column label="角色名称" prop="roleName"></el-table-column>
         <el-table-column label="角色名称" prop="roleDesc"></el-table-column>
@@ -37,10 +69,7 @@
               @click="removeRoleById(scope.row.id)"
               >删除</el-button
             >
-            <el-button
-              size="mini"
-              type="warning"
-              icon="el-icon-setting"
+            <el-button size="mini" type="warning" icon="el-icon-setting"
               >分配权限</el-button
             >
           </template>
@@ -146,7 +175,8 @@ export default {
           { required: true, message: "请输入角色描述", trigger: "blur" },
         ],
       },
-      editForm:{},
+      editForm: {},
+      rightsList: [],
     };
   },
   created() {
@@ -181,66 +211,93 @@ export default {
     // 监听添加角色对话框的关闭事件
     addRoleClosed() {
       this.$refs.addFormRef.resetFields();
-    },    
+    },
 
     // 监听关闭角色对话框的关闭事件
     editRoleClosed() {
       this.$refs.editFormRef.resetFields();
     },
 
-    async showEditDialog(id){
-      const {data:res} = await this.$http.get(`roles/${id}`)
-      if(res.meta.status !== 200){
-        return this.$message.error('查询角色信息失败!')
+    async showEditDialog(id) {
+      const { data: res } = await this.$http.get(`roles/${id}`);
+      if (res.meta.status !== 200) {
+        return this.$message.error("查询角色信息失败!");
       }
-      this.editForm = res.data
-      this.editDialogVisible = true
+      this.editForm = res.data;
+      this.editDialogVisible = true;
     },
 
-    editRole(){
-      this.$refs.editFormRef.validate(async (validate)=>{
-        if (!validate){
-          return
+    editRole() {
+      this.$refs.editFormRef.validate(async (validate) => {
+        if (!validate) {
+          return;
         }
-        const {data:res} = await this.$http.put(`roles/${this.editForm.roleId}`,{
-          roleName: this.editForm.roleName,
-          roleDesc: this.editForm.roleDesc
-        })
-        if(res.meta.status !== 200){
-          return this.$message.error('更新角色信息失败')
-        }
-        this.editDialogVisible = false
-        this.getRolesList()
-        this.$message.success('更新用户信息成功')
-      })
-    },
-
-    removeRoleById(id){
-        this.$confirm('确认删除该角色吗?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(async () => {
-          const {data:res} = await this.$http.delete(`roles/${id}`)
-          if(res.meta.status !== 200){
-            return this.$message.error('删除角色失败')
+        const { data: res } = await this.$http.put(
+          `roles/${this.editForm.roleId}`,
+          {
+            roleName: this.editForm.roleName,
+            roleDesc: this.editForm.roleDesc,
           }
-          this.getRolesList()
-          this.$message({
-            type: 'success',
-            message: '删除角色成功!'
-          });
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          });          
-        });
-    }
+        );
+        if (res.meta.status !== 200) {
+          return this.$message.error("更新角色信息失败");
+        }
+        this.editDialogVisible = false;
+        this.getRolesList();
+        this.$message.success("更新用户信息成功");
+      });
+    },
 
+    removeRoleById(id) {
+      this.$confirm("确认删除该角色吗?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(async () => {
+          const { data: res } = await this.$http.delete(`roles/${id}`);
+          if (res.meta.status !== 200) {
+            return this.$message.error("删除角色失败");
+          }
+          this.getRolesList();
+          this.$message({
+            type: "success",
+            message: "删除角色成功!",
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除",
+          });
+        });
+    },
+
+    async showRightDialog() {
+      // 获取所有权限列表
+      const { data: res } = await this.$http.get(`rights/tree`);
+      if (res.meta.status !== 200) {
+        return this.$message.error("获取权限列表失败");
+      }
+      this.rightsList = res.data;
+      // 获取角色下所有三级权限的ID
+    },
   },
 };
 </script>
 
 <style>
+.el-tag {
+  margin: 6px;
+}
+.bdbottom {
+  border-bottom: 1px solid #eee;
+}
+.bdtop {
+  border-top: 1px solid #eee;
+}
+.vcenter {
+  display: flex;
+  align-items: center;
+}
 </style>
