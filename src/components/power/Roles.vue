@@ -80,7 +80,11 @@
               @click="removeRoleById(scope.row.id)"
               >删除</el-button
             >
-            <el-button size="mini" type="warning" icon="el-icon-setting"
+            <el-button
+              size="mini"
+              type="warning"
+              icon="el-icon-setting"
+              @click="showRightDialog(scope.row.id)"
               >分配权限</el-button
             >
           </template>
@@ -155,6 +159,28 @@
         <el-button type="primary" @click="editRole">确 定</el-button>
       </div>
     </el-dialog>
+
+    <!-- 分配权限的对话框 -->
+    <el-dialog
+      title="分配权限"
+      :visible.sync="rightDialogVisible"
+      width="50%"
+      @close="rightDialogClosed"
+    >
+      <el-tree
+        ref="treeRef"
+        :data="rightsList"
+        :props="treeProps"
+        node-key="id"
+        show-checkbox
+        default-expand-all
+        :default-checked-keys="defaultKeys"
+      ></el-tree>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="rightDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="allotRights">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -187,7 +213,17 @@ export default {
         ],
       },
       editForm: {},
+      rightDialogVisible: false,
       rightsList: [],
+      // 树形组件的属性绑定对象
+      treeProps: {
+        label: "authName",
+        children: "children",
+      },
+      // 默认选中的节点id值数组
+      defaultKeys: [],
+      // 当前要分配权限的角色id
+      roleId: "",
     };
   },
   created() {
@@ -311,15 +347,57 @@ export default {
           });
         });
     },
-
-    async showRightDialog() {
+    // 显示分配权限的对话框
+    async showRightDialog(role) {
       // 获取所有权限列表
       const { data: res } = await this.$http.get(`rights/tree`);
       if (res.meta.status !== 200) {
         return this.$message.error("获取权限列表失败");
       }
       this.rightsList = res.data;
-      // 获取角色下所有三级权限的ID
+
+      // 获取角色下所有三级权限的id
+      this.getLeafKeys(role);
+
+      // 存储当前要分配权限的角色id
+      this.roleId = role.id;
+
+      this.rightDialogVisible = true;
+    },
+    // 获取角色下所有三级权限的id
+    getLeafKeys(node) {
+      // 判断是否为三级权限
+      if (!node.children) {
+        return this.defaultKeys.push(node.id);
+      }
+      // 如果不是三级权限，则递归操作
+      node.children.forEach((item) => {
+        this.getLeafKeys(item);
+      });
+    },
+    // 监听分配权限对话框的关闭事件
+    rightDialogClosed() {
+      this.defaultKeys = [];
+    },
+    // 分配权限
+    async allotRights() {
+      const keys = this.$refs.treeRef
+        .getCheckedKeys()
+        .concat(this.$refs.treeRef.getHalfCheckedKeys());
+      const idStr = keys.join(",");
+
+      const { data: res } = await this.$http.post(
+        `roles/${this.roleId}/rights`,
+        {
+          rids: idStr,
+        }
+      );
+      if (res.meta.status !== 200) {
+        return this.$message.error("分配权限失败");
+      }
+      this.rightDialogVisible = false;
+      this.getRolesList();
+      this.$message.success("分配权限成功");
     },
   },
 };
