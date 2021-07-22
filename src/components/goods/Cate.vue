@@ -56,6 +56,19 @@
           >
         </template>
       </tree-table>
+
+      <div class="block">
+        <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page="queryInfo.pagenum"
+          :page-sizes="[3, 5, 10, 20]"
+          :page-size="queryInfo.pagesize"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="total"
+        >
+        </el-pagination>
+      </div>
     </el-card>
   </div>
 </template>
@@ -110,6 +123,14 @@ export default {
       }
       this.cateList = res.data.result;
       this.total = res.data.total;
+    },
+    handleSizeChange(pagesize) {
+      this.queryInfo.pagesize = pagesize;
+      this.getCateList();
+    },
+    handleCurrentChange(pagenum) {
+      this.queryInfo.pagenum = pagenum;
+      this.getCateList();
     },
   },
 };
