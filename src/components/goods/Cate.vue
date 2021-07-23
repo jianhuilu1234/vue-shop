@@ -9,7 +9,7 @@
 
     <!-- 卡片视图 -->
     <el-card>
-      <el-button type="primary">添加分类</el-button>
+      <el-button type="primary" @click="showAddDialog">添加分类</el-button>
 
       <tree-table
         class="tree-table"
@@ -70,6 +70,37 @@
         </el-pagination>
       </div>
     </el-card>
+
+    <el-dialog
+      title="添加分类"
+      :visible.sync="addDialogVisible"
+      width="50%"
+      @close="addDialogClosed"
+    >
+      <el-form
+        :model="addForm"
+        :rules="addFormRules"
+        ref="addFormRef"
+        label-width="100px"
+      >
+        <el-form-item label="分类名称" prop="cat_name">
+          <el-input v-model="addForm.cat_name"></el-input>
+        </el-form-item>
+        <el-form-item label="父级分类">
+          <el-cascader
+            v-model="selectedKeys"
+            :options="parentCateList"
+            :props="cascaderProps"
+            @change="handleChange"
+            clearable
+          ></el-cascader>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="addDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="addCate()">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -108,6 +139,27 @@ export default {
           template: "operate",
         },
       ],
+      addDialogVisible: false,
+      addForm: {
+        cat_name: "", // 分类名称
+        cat_pid: 0, // 父级分类的id
+        cat_level: 0, // 分类的等级，默认为一级分类
+      },
+      addFormRules: {
+        cat_name: [
+          { required: true, message: "请输入分类名称", trigger: "blur" },
+        ],
+      },
+      parentCateList: [],
+      // 级联选择器的配置对象
+      cascaderProps: {
+        label: "cat_name",
+        value: "cat_id",
+        children: "children",
+        expandTrigger: "hover",
+        checkStrictly: true, // 选择任意一个选项
+      },
+      selectedKeys: [],
     };
   },
   created() {
@@ -132,9 +184,63 @@ export default {
       this.queryInfo.pagenum = pagenum;
       this.getCateList();
     },
+    showAddDialog() {
+      this.getParentCateList();
+      this.addDialogVisible = true;
+    },
+    addDialogClosed() {
+      (this.addForm.cat_name = ""), // 分类名称
+        (this.addForm.cat_pid = 0), // 父级分类的id
+        (this.addForm.cat_level = 0), // 分类的等级，默认为一级分类
+        this.$refs.addFormRef.resetFields();
+    },
+    // 获取父级分类的数据列表
+    async getParentCateList() {
+      const { data: res } = await this.$http.get("categories", {
+        params: { type: 2 },
+      });
+      if (res.meta.status !== 200) {
+        return this.$message.error("获取父级分类数据失败");
+      }
+      // console.log(res.data)
+      this.parentCateList = res.data;
+    },
+    // 监听级联选择器的改变事件
+    handleChange() {
+      // console.log(this.selectedKeys)
+      // 判断是否选择了父级分类
+      if (this.selectedKeys.length > 0) {
+        this.addForm.cat_pid = this.selectedKeys[this.selectedKeys.length - 1];
+        this.addForm.cat_level = this.selectedKeys.length;
+      } else {
+        this.addForm.cat_pid = 0;
+        this.addForm.cat_level = 0;
+      }
+    },
+    // 添加分类
+    addCate() {
+      this.$refs.addFormRef.validate(async (valid) => {
+        if (!valid) {
+          return;
+        }
+        const { data: res } = await this.$http.post("categories", this.addForm);
+        if (res.meta.status !== 201) {
+          return this.$message.error("添加分类失败");
+        }
+        this.addDialogVisible = false;
+        this.getCateList();
+        this.$message.success("添加分类成功！");
+      });
+    },
   },
 };
 </script>
 
 <style>
+.el-cascader{
+    width: 100%;
+}
+.tree-table{
+    margin-top: 15px;
+}
 </style>
