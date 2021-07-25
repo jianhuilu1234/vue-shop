@@ -295,6 +295,22 @@ export default {
             this.$message.success('修改分类成功！')
         })
     },
+    removeCateById(cateId) {
+        this.$confirm('确认删除该分类?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(async () => {
+          const {data: res} = await this.$http.delete(`categories/${cateId}`)
+          if(res.meta.status !== 200){
+            return this.$message.error('删除分类失败!')
+          }
+          this.$message.success('删除分类成功!')
+          this.getCateList()
+        }).catch(() => {
+          return this.$message.info('已取消删除')
+        });
+      }
   },
 };
 </script>
