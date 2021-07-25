@@ -101,6 +101,29 @@
         <el-button type="primary" @click="addCate()">确 定</el-button>
       </span>
     </el-dialog>
+
+    <!-- 编辑分类 -->
+    <el-dialog
+      title="编辑分类"
+      :visible.sync="editDialogVisible"
+      width="50%"
+      @close="editDialogClosed"
+    >
+      <el-form
+        :model="editForm"
+        :rules="editFormRules"
+        ref="editFormRef"
+        label-width="100px"
+      >
+        <el-form-item label="分类名称" prop="cat_name">
+          <el-input v-model="editForm.cat_name"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="editDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="editCate()">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -146,6 +169,13 @@ export default {
         cat_level: 0, // 分类的等级，默认为一级分类
       },
       addFormRules: {
+        cat_name: [
+          { required: true, message: "请输入分类名称", trigger: "blur" },
+        ],
+      },
+      editDialogVisible: false,
+      editForm: {},
+      editFormRules: {
         cat_name: [
           { required: true, message: "请输入分类名称", trigger: "blur" },
         ],
@@ -232,15 +262,48 @@ export default {
         this.$message.success("添加分类成功！");
       });
     },
+
+    async showEditDialog(cateId) {
+      const { data: res } = await this.$http.get(`categories/${cateId}`);
+      if (res.meta.status !== 200) {
+        return this.$message.error("获取分类信息失败");
+      }
+      this.editForm = res.data;
+      this.editDialogVisible = true;
+    },
+
+    editDialogClosed() {
+      (this.addForm.cat_name = ""), // 分类名称
+        (this.addForm.cat_pid = 0), // 父级分类的id
+        (this.addForm.cat_level = 0), // 分类的等级，默认为一级分类
+        this.$refs.editFormRef.resetFields();
+    },
+
+    editCate() {
+        this.$refs.editFormRef.validate(async valid =>{
+            if (!valid){
+                return
+            }
+            const {data: res} = await this.$http.put(`categories/${this.editForm.cat_id}`, {
+                cat_name: this.editForm.cat_name
+            })
+            if(res.meta.status !== 200){
+              return this.$message.error('修改分类失败')
+            }
+            this.getCateList()
+            this.editDialogVisible = false
+            this.$message.success('修改分类成功！')
+        })
+    },
   },
 };
 </script>
 
 <style>
-.el-cascader{
-    width: 100%;
+.el-cascader {
+  width: 100%;
 }
-.tree-table{
-    margin-top: 15px;
+.tree-table {
+  margin-top: 15px;
 }
 </style>
