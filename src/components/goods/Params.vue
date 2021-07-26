@@ -99,6 +99,29 @@
           </el-table>
         </el-tab-pane>
       </el-tabs>
+
+      <!-- 添加对话框 -->
+      <el-dialog
+        :title="'添加' + title"
+        :visible.sync="addDialogVisible"
+        width="50%"
+        @close="addDialogClosed"
+      >
+        <el-form
+          :model="addForm"
+          :rules="addFormRules"
+          ref="addFormRef"
+          label-width="100px"
+        >
+          <el-form-item :label="title" prop="attr_name">
+            <el-input v-model="addForm.attr_name"></el-input>
+          </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="addDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="addParams">确 定</el-button>
+        </span>
+      </el-dialog>
     </el-card>
   </div>
 </template>
@@ -119,8 +142,14 @@ export default {
       },
       cateList: [],
       activeName: "many",
-      addDialogVisible: true,
+      addDialogVisible: false,
       paramsData: [],
+      addForm: {},
+      addFormRules: {
+        attr_name: [
+          { required: true, message: "请输入参数名称", trigger: "blur" },
+        ],
+      },
     };
   },
   computed: {
@@ -130,6 +159,11 @@ export default {
     // 是否禁用按钮
     btnDisabled() {
       return this.selectedKeys.length === 3 ? false : true;
+    },
+
+    // 添加对话框的标题
+    title() {
+      return this.activeName === "many" ? "动态参数" : "静态属性";
     },
   },
   methods: {
@@ -143,8 +177,8 @@ export default {
       }
       this.cateList = res.data;
     },
-    handleClick(tab, event) {
-      console.log(tab, event);
+    handleClick() {
+      this.getParamsData();
     },
 
     async getParamsData() {
@@ -168,8 +202,30 @@ export default {
         return this.$message.error("获取参数列表失败");
       }
 
-      console.log(res.data);
       this.paramsData = res.data;
+    },
+    addDialogClosed() {
+      this.$refs.addFormRef.resetFields();
+    },
+    addParams() {
+      this.$refs.addFormRef.validate(async (valid) => {
+        if (!valid) {
+          return;
+        }
+        const { data: res } = await this.$http.post(
+          `categories/${this.cateId}/attributes`,
+          {
+            attr_name: this.addForm.attr_name,
+            attr_sel: this.activeName,
+          }
+        );
+        if(res.meta.status !== 201){
+          return this.$message.error('添加参数失败')
+        }
+        this.addDialogVisible = false
+        this.getParamsData()
+        this.$message.success('添加参数成功!')
+      });
     },
   },
 };
