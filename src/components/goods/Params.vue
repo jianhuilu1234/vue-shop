@@ -63,7 +63,41 @@
             </el-table-column>
           </el-table>
         </el-tab-pane>
-        <el-tab-pane label="静态属性" name="mini">配置管理</el-tab-pane>
+        <el-tab-pane label="静态属性" name="only">
+          <el-button
+            type="primary"
+            size="mini"
+            :disabled="btnDisabled"
+            @click="addDialogVisible = true"
+            >添加属性</el-button
+          >
+          <el-table :data="paramsData" border stripe>
+            <el-table-column label="明细" type="expand"></el-table-column>
+            <el-table-column label="序号" type="index"></el-table-column>
+            <el-table-column
+              label="属性名称"
+              prop="attr_name"
+            ></el-table-column>
+            <el-table-column label="操作">
+              <template slot-scope="scope">
+                <el-button
+                  type="primary"
+                  size="mini"
+                  icon="el-icon-edit"
+                  @click="showEditDialog(scope.row.attr_id)"
+                  >编辑</el-button
+                >
+                <el-button
+                  type="danger"
+                  size="mini"
+                  icon="el-icon-delete"
+                  @click="removeParams(scope.row.attr_id)"
+                  >删除</el-button
+                >
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-tab-pane>
       </el-tabs>
     </el-card>
   </div>
@@ -85,7 +119,6 @@ export default {
       },
       cateList: [],
       activeName: "many",
-      btnDisabled: true,
       addDialogVisible: true,
       paramsData: [],
     };
@@ -93,6 +126,10 @@ export default {
   computed: {
     cateId() {
       return this.selectedKeys.length === 3 ? this.selectedKeys[2] : null;
+    },
+    // 是否禁用按钮
+    btnDisabled() {
+      return this.selectedKeys.length === 3 ? false : true;
     },
   },
   methods: {
@@ -132,6 +169,7 @@ export default {
       }
 
       console.log(res.data);
+      this.paramsData = res.data;
     },
   },
 };
