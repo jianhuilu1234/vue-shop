@@ -123,6 +123,29 @@
         </span>
       </el-dialog>
     </el-card>
+
+    <!-- 修改对话框 -->
+    <el-dialog
+      :title="'修改' + title"
+      :visible.sync="editDialogVisible"
+      width="50%"
+      @close="editDialogClosed"
+    >
+      <el-form
+        :model="editForm"
+        :rules="editFormRules"
+        ref="editFormRef"
+        label-width="100px"
+      >
+        <el-form-item :label="title" prop="attr_name">
+          <el-input v-model="editForm.attr_name"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="editDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="editParams">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -150,6 +173,13 @@ export default {
           { required: true, message: "请输入参数名称", trigger: "blur" },
         ],
       },
+      editFormRules: {
+        attr_name: [
+          { required: true, message: "请输入参数名称", trigger: "blur" },
+        ],
+      },
+      editDialogVisible: false,
+      editForm: {},
     };
   },
   computed: {
@@ -207,6 +237,9 @@ export default {
     addDialogClosed() {
       this.$refs.addFormRef.resetFields();
     },
+    editDialogClosed() {
+      this.$refs.addFormRef.resetFields();
+    },
     addParams() {
       this.$refs.addFormRef.validate(async (valid) => {
         if (!valid) {
@@ -219,13 +252,67 @@ export default {
             attr_sel: this.activeName,
           }
         );
-        if(res.meta.status !== 201){
-          return this.$message.error('添加参数失败')
+        if (res.meta.status !== 201) {
+          return this.$message.error("添加参数失败");
         }
-        this.addDialogVisible = false
-        this.getParamsData()
-        this.$message.success('添加参数成功!')
+        this.addDialogVisible = false;
+        this.getParamsData();
+        this.$message.success("添加参数成功!");
       });
+    },
+    // 删除参数
+    removeParams(id) {
+      this.$confirm("确定要删除该参数吗", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(async () => {
+          const { data: res } = await this.$http.delete(
+            `categories/${this.cateId}/attributes/${id}`
+          );
+          if (res.meta.status !== 200) {
+            return this.$message.error("删除参数失败");
+          }
+          this.getParamsData();
+          this.$message.success("删除参数成功！");
+        })
+        .catch(() => {
+          this.$message.info("已取消删除！");
+        });
+    },
+    // 显示编辑对话框
+    async showEditDialog(id) {
+      const { data: res } = await this.$http.get(
+        `categories/${this.cateId}/attributes/${id}`,
+        {
+          params: { attr_sel: this.activeName },
+        }
+      );
+      if (res.meta.status !== 200) {
+        return this.$message.error("查询参数信息失败");
+      }
+      this.editForm = res.data;
+      this.editDialogVisible = true;
+    },
+    // 修改参数
+    editParams() {
+      this.$refs.editFormRef.validate(async (valid) => {
+        if (!valid) {
+          return
+        }
+        const { data: res } = await this.$http.put(`categories/${this.cateId}/attributes/${this.editForm.attr_id}`, {
+          attr_name: this.editForm.attr_name,
+          attr_sel: this.activeName,
+          attr_vals: this.editForm.attr_vals,
+        })
+        if (res.meta.status !== 200) {
+          return this.$message.error('修改参数名称失败')
+        }
+        this.editDialogVisible = false
+        this.getParamsData()
+        this.$message.success('修改参数名称成功！')
+      })
     },
   },
 };
