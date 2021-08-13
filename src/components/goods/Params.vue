@@ -376,6 +376,10 @@ export default {
           this.$refs.saveTagInput.$refs.input.focus();
         });
     },
+    handleClose(row, i){
+      row.attr_vals.splice(i, 1)
+      this.updateParamsDetail(row)
+    }
   },
 };
 </script>
