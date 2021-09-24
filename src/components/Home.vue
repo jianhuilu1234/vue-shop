@@ -3,8 +3,8 @@
     <!-- 头部 -->
     <el-header>
       <div class="left">
-        <img src="../assets/imgs/shop.png" alt="" />
-        <span>电商后台管理系统</span>
+        <img src="../assets/imgs/pa_icon.png" alt="" />
+        <span>研发测试管理系统</span>
       </div>
       <div class="right">
         <span>欢迎您: {{ userInfo.username }}</span>
@@ -101,7 +101,7 @@ export default {
 }
 
 .el-header {
-  background: url("../assets/imgs/header_bg.gif") repeat-x center;
+  background: url("../assets/imgs/header_bg2.gif") repeat-x center;
   height: 50px !important;
   display: flex;
   justify-content: space-between;
@@ -134,7 +134,9 @@ export default {
   }
 
   .toggle-button {
-    background: #60779d;
+    // background: #60779d;
+    // background: #303643;
+    background: gray;
     font-size: 10px;
     line-height: 24px;
     text-align: center;
