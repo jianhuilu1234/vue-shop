@@ -31,7 +31,7 @@ const routes = [{
       {
         path: '/roles',
         component: () => import('../components/power/Roles.vue')
-      }, 
+      },
       {
         path: '/categories',
         component: () => import('../components/goods/Cate.vue')
@@ -39,6 +39,10 @@ const routes = [{
       {
         path: '/params',
         component: () => import('../components/goods/Params.vue')
+      },
+      {
+        path: '/diff',
+        component: () => import('../components/tools/Diff.vue')
       },
     ]
   }
