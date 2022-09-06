@@ -71,24 +71,45 @@
     </el-dialog>
 
     <el-table :data="projectList" stripe border>
+      <el-table-column label="明细" type="expand">
+          <template slot-scope="scope">
+            <el-table :data="scope.row.children" stripe border>
+              <el-table-column label="序号" type="index"></el-table-column>
+              <el-table-column label="子系统" prop="sysName"></el-table-column>
+              <el-table-column label="自动化率" prop="ratio"></el-table-column>
+              <el-table-column label="用例数量" prop="case"></el-table-column>
+              <el-table-column label="自动化数量" prop="autocase"></el-table-column>
+              <el-table-column label="结果" prop="result"></el-table-column>
+              <!-- <el-table-column label="结果" >
+                <template slot-scope="scope1">
+                  <el-button
+                    :type="getResultInfoByResult(scope1.result).type"
+                    :icon="getResultInfoByResult(scope1.row.result).icon"
+                    size="mini"
+                    circle
+                  ></el-button>
+                </template >
+            </el-table-column> -->
+            </el-table>
+          </template>
+        </el-table-column>
+
       <el-table-column label="序号" type="index"></el-table-column>
       <el-table-column label="项目组" prop="projectName"></el-table-column>
-      <el-table-column label="自动化率" prop="ratio"></el-table-column>
+      <el-table-column label="自动化率" prop="ratio"  width='90' ></el-table-column>
       <el-table-column label="负责人" prop="owner"></el-table-column>
-      <el-table-column label="通知邮箱" prop="email"></el-table-column>
-      <el-table-column label="结果"  prop="success">
+      <el-table-column label="通知邮箱" prop="email" width='190' ></el-table-column>
+      <el-table-column label="结果"  prop="success" width='90'>
           <template slot-scope="scope">
             <el-button
               :type="getResultInfoByResult(scope.row.result).type"
               :icon="getResultInfoByResult(scope.row.result).icon"
-              @click="showDetail(scope.row.id)"
               size="mini"
               circle
             ></el-button>
           </template >
       </el-table-column>
-      <!-- <el-table-column label="运行时间" prop="runtime"></el-table-column> -->
-      <el-table-column label="状态">
+      <el-table-column label="状态" width="90" >
         <template slot-scope="scope">
           <el-switch
             v-model="scope.row.mg_state"
@@ -97,13 +118,14 @@
           </el-switch>
         </template>
       </el-table-column>
-      <el-table-column label="操作" prop="role_name">
+      <el-table-column label="操作" prop="role_name" >
         <template slot-scope="scope">
           <el-tooltip
             effect="dark"
             content="修改项目"
             placement="top"
             :enterable="false"
+            
           >
             <el-button
               size="mini"
@@ -183,6 +205,7 @@ export default {
       },
       // 项目列表数据
       projectList: [],
+      projectDetailList: [],
       // 总记录数
       total: 0,
       addDialogVisible: false,
@@ -380,6 +403,14 @@ export default {
         return {"type": "danger", "icon": "el-icon-error"}
       }
       
+    },
+    async getProjectDetailById(id) {
+        const {data: res} = await this.$http.get(`auto/${id}/detail`);
+        if (res.meta.status !== 200) {
+        return this.$message.error("获取当前项目详细数据失败");
+      }
+      this.projectDetailList = res.data;
+      // this.editDialogVisible = true;
     },
   },
 };
