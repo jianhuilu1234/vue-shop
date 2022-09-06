@@ -43,6 +43,14 @@ const routes = [{
       {
         path: '/diff',
         component: () => import('../components/tools/Diff.vue')
+      },      
+      {
+        path: '/sql',
+        component: () => import('../components/tools/Sql.vue')
+      }, 
+      {
+        path: '/auto',
+        component: () => import('../components/tools/Auto.vue')
       },
     ]
   }

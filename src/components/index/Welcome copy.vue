@@ -11,41 +11,41 @@
       <el-col :span="6">
         <div class="statistics" style="background: #409eff">
           <div class="title">
-            <p>高风险SQL</p>
+            <p>用户统计</p>
             <el-tag size="mini" type="success">实时</el-tag>
           </div>
           <div class="num">{{ totalUsers }}</div>
-          <div class="tip">当前下降率</div>
+          <div class="tip">当前总用户数量</div>
         </div>
       </el-col>
       <el-col :span="6">
         <div class="statistics" style="background: #e6a23c">
           <div class="title">
-            <p>自动化覆盖率</p>
+            <p>商品统计</p>
             <el-tag size="mini" type="info">实时</el-tag>
           </div>
           <div class="num">{{ totalGoods }}</div>
-          <div class="tip">当前总覆盖率</div>
+          <div class="tip">当前总商品数量</div>
         </div>
       </el-col>
       <el-col :span="6">
         <div class="statistics" style="background: #67c23a">
           <div class="title">
-            <p>脚本统计</p>
+            <p>订单统计</p>
             <el-tag size="mini" type="warning">实时</el-tag>
           </div>
           <div class="num">{{ totalOrders }}</div>
-          <div class="tip">当前自动化脚本数量</div>
+          <div class="tip">当前总订单数量</div>
         </div>
       </el-col>
       <el-col :span="6">
         <div class="statistics" style="background: #909399">
           <div class="title">
-            <p>发版统计</p>
+            <p>销售统计</p>
             <el-tag size="mini" type="primary">实时</el-tag>
           </div>
           <div class="num">{{ totalSales }}</div>
-          <div class="tip">当前发版总数</div>
+          <div class="tip">当前总销售额(元)</div>
         </div>
       </el-col>
     </el-row>
@@ -126,7 +126,7 @@ export default {
 
       var option = {
         title: {
-          text: '发版趋势',
+          text: '订单趋势',
         },
         tooltip: {
           trigger: 'axis',

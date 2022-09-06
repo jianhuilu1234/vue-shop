@@ -8,7 +8,7 @@
                 <img src="../assets/imgs/login_logo.png" alt="头像框">
             </div>
             <div class="title">
-                研发测试管理系统
+                电商后台管理系统
             </div>
             <!-- 登录表单 -->
             <el-form ref="loginFormRef" class="login-form" :model="loginForm" :rules="loginFormRules">

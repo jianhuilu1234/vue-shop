@@ -9,7 +9,7 @@ import './assets/css/global.css'
 import './assets/fonts/iconfont.css'
 
 import axios from 'axios'
-// axios.defaults.baseURL = 'http://www.tangxiaoyang.vip:8888/api/v2/'
+axios.defaults.baseURL = 'http://www.tangxiaoyang.vip:8888/api/v2/'
 // axios.defaults.baseURL = 'http://192.168.3.14:5001/api/v2/'
 axios.defaults.baseURL = 'http://localhost:5001/api/v2/'
 // 拦截所有请求，为请求头添加token认证
